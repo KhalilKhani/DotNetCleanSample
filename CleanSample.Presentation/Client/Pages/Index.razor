@@ -1,0 +1,193 @@
+﻿@page "/"
+@inject HttpClient Http
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Customer Management</PageTitle>
+
+<h1 class="d-flex justify-content-between">
+    Customers List
+    <button id="AddCustomerButton" class="btn btn-primary" @onclick="OpenCreateModal">Add Customer</button>
+</h1>
+
+
+@if (_customerDtos == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table id="CustomersTable" class="table">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Birth Date</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Bank Account</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (_customerDtos.Length == 0)
+            {
+                <tr>
+                    <td colspan="7">No customers found.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var dto in _customerDtos)
+                {
+                    <tr>
+                        <td>@dto.Firstname</td>
+                        <td>@dto.Lastname</td>
+                        <td>@dto.DateOfBirth.ToShortDateString()</td>
+                        <td>@dto.PhoneNumber</td>
+                        <td class="email">@dto.Email</td>
+                        <td>@dto.BankAccountNumber</td>
+                        <td>
+                            <button class="btn btn-info update" @onclick="() => OpenUpdateModal(dto)">Update</button>
+                            <button class="btn btn-danger delete" @onclick="() => DeleteCustomer(dto.Id)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+
+<div class="modal" tabindex="-1" id="customerModal" style="display: @(_showModal ? "block" : "none");">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@(_updateMode ? "Update Customer" : "Add Customer")</h5>
+                <button type="button" class="btn-close" @onclick="CloseModal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="_customerDto" OnValidSubmit="_updateMode ? UpdateCustomer : AddCustomer">
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="firstname" class="form-label">First Name</label>
+                                <InputText class="form-control" id="firstname" @bind-Value="_customerDto.Firstname" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="birthdate" class="form-label">Birth Date</label>
+                                <InputDate class="form-control" id="birthdate" @bind-Value="_customerDto.DateOfBirth" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <InputText class="form-control" id="phone" @bind-Value="_customerDto.PhoneNumber" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="lastname" class="form-label">Last Name</label>
+                                <InputText class="form-control" id="lastname" @bind-Value="_customerDto.Lastname" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <InputText class="form-control" id="email" @bind-Value="_customerDto.Email" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="bankAccount" class="form-label">Bank Account Number</label>
+                                <InputText class="form-control" id="bankAccount" @bind-Value="_customerDto.BankAccountNumber" />
+                            </div>
+                        </div>
+                    </div>
+                    <button id="ModalSubmitButton" type="submit" class="btn btn-primary">@(_updateMode ? "Update" : "Add")</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CustomerDto[]? _customerDtos;
+    private CustomerDto _customerDto = new CustomerDto();
+    private bool _showModal;
+    private bool _updateMode;
+
+    private void OpenCreateModal()
+    {
+        _updateMode = false;
+        _customerDto = new CustomerDto { DateOfBirth = new DateTime(2000, 01, 01) };
+        _showModal = true;
+    }
+
+    private void OpenUpdateModal(CustomerDto customerDto)
+    {
+        _updateMode = true;
+        _customerDto = customerDto;
+        _showModal = true;
+    }
+
+    private void CloseModal()
+    {
+        _showModal = false;
+    }
+
+    private async Task AddCustomer()
+    {
+        var response = await Http.PostAsJsonAsync("api/Customers", _customerDto);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            await JsRuntime.InvokeVoidAsync("alert", $"Error adding customer: {errorContent}");
+        }
+        else
+        {
+            CloseModal();
+            await RefreshData();
+        }
+    }
+
+    private async Task UpdateCustomer()
+    {
+        var response = await Http.PutAsJsonAsync($"api/Customers/{_customerDto.Id}", _customerDto);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            await JsRuntime.InvokeVoidAsync("alert", $"Error updating customer: {errorContent}");
+        }
+        else
+        {
+            CloseModal();
+            await RefreshData();
+        }
+    }
+
+    private async Task DeleteCustomer(int id)
+    {
+        var response = await Http.DeleteAsync($"api/Customers/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            await JsRuntime.InvokeVoidAsync("alert", $"Error deleting customer: {errorContent}");
+        }
+        else
+        {
+            await RefreshData();
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        try
+        {
+            _customerDtos = await Http.GetFromJsonAsync<CustomerDto[]>("api/Customers");
+        }
+        catch (Exception e)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"Error loading customers: {e.Message}");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshData();
+    }
+}
