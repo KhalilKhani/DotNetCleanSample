@@ -1,15 +1,15 @@
 # .NET CRUD SAMPLE
 
-This is an ASP.NET WebAPI project that implements a CRUD application using
-Domain-Driven Design (**DDD**)
-Behavior-Driven Development (**BDD**)
-Test-Driven Development (**TDD**)
-And Command Query Responsibility Segregation (**CQRS**) principles.
+This is an ASP.NET WebAPI project that implements a CRUD application using  
+Domain-Driven Design (**DDD**),  
+Behavior-Driven Development (**BDD**),  
+Test-Driven Development (**TDD**),  
+And Command Query Responsibility Segregation (**CQRS**) principles.  
 
-It uses
-**SpecFlow** for BDD,
-**Selenuim** for end to end tests,
-**xUnit** for unit tests,
+It uses  
+**SpecFlow** for BDD,  
+**Selenuim** for end to end tests,  
+**xUnit** for unit tests,  
 And **TestContainers** for throwaway instances of DataBase,
 
 ## Model
