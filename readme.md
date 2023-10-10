@@ -7,16 +7,14 @@ Behavior-Driven Development (**BDD**),
 Test-Driven Development (**TDD**),  
 And Command and Query Responsibility Segregation (**CQRS**) principles.  
 
-It uses  
+It uses:  
 **SpecFlow** for BDD,  
 **Selenium** for end to end tests,  
 **xUnit** for unit tests,  
-And **Testcontainers** for throwaway instances of DataBase,
+And **Testcontainers** for throwaway instances of database,
 
-## Model
-
-The project uses the following model:
-
+## Model  
+The project uses the following model:  
 ```csharp
 public class Customer {
     public string FirstName { get; set; }
