@@ -1,10 +1,11 @@
 # .NET CRUD SAMPLE
 
 This is an ASP.NET WebAPI project that implements a CRUD application using  
+Clean Architecture,  
 Domain-Driven Design (**DDD**),  
 Behavior-Driven Development (**BDD**),  
 Test-Driven Development (**TDD**),  
-And Command Query Responsibility Segregation (**CQRS**) principles.  
+And Command and Query Responsibility Segregation (**CQRS**) principles.  
 
 It uses  
 **SpecFlow** for BDD,  
