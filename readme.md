@@ -8,9 +8,9 @@ And Command Query Responsibility Segregation (**CQRS**) principles.
 
 It uses  
 **SpecFlow** for BDD,  
-**Selenuim** for end to end tests,  
+**Selenium** for end to end tests,  
 **xUnit** for unit tests,  
-And **TestContainers** for throwaway instances of DataBase,
+And **Testcontainers** for throwaway instances of DataBase,
 
 ## Model
 
@@ -40,6 +40,6 @@ However, when running in TestMode, it runs on port 7001 for HTTPS and port 7000 
 
 ## Acceptance Tests  
 For the acceptance tests, you don't need to start the API project manually. When you run the tests, the API project will automatically spin up for each scenario.  
-**Note**: As we use TestContainers in acceptance tests, make sure the docker (docker desktop in windows) is up and running on your machine. 
+**Note**: As we use Testcontainers in acceptance tests, make sure the docker (docker desktop in windows) is up and running on your machine. 
 
 For any further information or assistance, please contact me via **khalil.khani2020@gmail.com**
